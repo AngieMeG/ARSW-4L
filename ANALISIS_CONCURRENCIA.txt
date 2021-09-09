@@ -4,3 +4,7 @@
 • Cuales son las respectivas regiones críticas?
     ‣ El metodo editBlueprint representa la región crítica más problematica en el codigo.
 
+La solucion diseñada utiliza un ConcurrentHashMap para almacenar las llaves de los bluprints que se estan usando. 
+Cuando un hilo entra a editar un blueprint primero se valida que dicho blueprint no este en uso.
+Si el blueprint no esta en uso, se sincroniza unicamente ese elemento y el hilo procede con la edicion, dejando la posibilidad de editar otros blueprints.
+Si el blueprint esta en uso, el hilo espera a que dicho blueprint cambie de estado.

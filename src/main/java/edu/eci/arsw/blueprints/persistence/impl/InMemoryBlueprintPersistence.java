@@ -13,11 +13,9 @@ import edu.eci.arsw.blueprints.persistence.BlueprintsPersistence;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.List;
 
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,7 +29,7 @@ import org.springframework.stereotype.Service;
 @Qualifier("InMemoryBlueprint")
 public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
 
-    private final Map<Tuple<String,String>,Blueprint> blueprints=new HashMap<>();
+    private static final Map<Tuple<String,String>,Blueprint> blueprints=new HashMap<>();
     private static ConcurrentHashMap<Tuple<String,String>, Boolean> inUse = new ConcurrentHashMap<Tuple<String,String>, Boolean>(); 
     public InMemoryBlueprintPersistence() {
         //load stub data
@@ -71,12 +69,7 @@ public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
         return new HashSet<>(blueprints.values());
     }
 
-    /**
-     * 
-     * @param author blueprint's author
-     * @return all the blueprints of the given author
-     * @throws BlueprintNotFoundException if the given author doesn't exist
-     */
+    @Override
     public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException{
         Set<Blueprint> blueprintsByAuthor = new HashSet<>();
         boolean authorExists = false;
@@ -93,7 +86,7 @@ public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
     }
 
     @Override
-    public void editBlueprint(String author, String bpname, Blueprint bp) throws BlueprintNotFoundException {
+    public void editBlueprint(String author, String bpname, Blueprint bp) throws BlueprintNotFoundException, BlueprintPersistenceException {
         Tuple<String, String> key = new Tuple<>(author, bpname);
         if (!blueprints.containsKey(key)) throw new BlueprintNotFoundException("The given bluprint doesn't exist");
 
@@ -104,11 +97,17 @@ public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
                 else inUse.replace(key, true);
                 blueprints.replace(key, bp);
                 inUse.replace(key, false);
-                blueprints.get(key).notifyAll();
-            } catch (Exception e) {
-                //TODO: handle exception
+                freeResource(key);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new BlueprintPersistenceException("Error editing the given blueprint");
             }           
         }
-        
+    }
+
+    synchronized static void freeResource(Tuple<String,String> key){
+        synchronized(blueprints.get(key)){
+            blueprints.get(key).notifyAll();
+        }
     }
 }

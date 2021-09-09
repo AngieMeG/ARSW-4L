@@ -5,7 +5,6 @@
  */
 package edu.eci.arsw.blueprints.controllers;
 
-import java.util.Set;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -34,40 +33,60 @@ public class BlueprintAPIController {
     @Autowired
     BlueprintsServices bps = null;
 
+    /**
+     * Method that allows the user to make a GET request to the blueprints in persistence 
+     * @return the reponse to the GET request in JSON format
+     */
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> getAllBlueprints(){   
         try {
             //obtener datos que se enviarán a través del API
-            return new ResponseEntity<Set<Blueprint>>(bps.getAllBlueprints(),HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(bps.getAllBlueprints(),HttpStatus.ACCEPTED);
         } catch (Exception ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
-            return new ResponseEntity<String>("Error loading blueprints",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Error loading the blueprints.",HttpStatus.NOT_FOUND);
         }        
     }
     
+    /**
+     * Method that allows the user to make a GET request to the authoe's bluepints in persistence
+     * @param author, the desired author of the bluepints
+     * @return the reponse to the GET request in JSON format
+     */
     @RequestMapping(value = "/{author}", method = RequestMethod.GET)
     public ResponseEntity<?> getBlueprintsForAuthor(@PathVariable String author){   
         try {
             //obtener datos que se enviarán a través del API
-            return new ResponseEntity<Set<Blueprint>>(bps.getBlueprintsByAuthor(author),HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(bps.getBlueprintsByAuthor(author),HttpStatus.ACCEPTED);
         } catch (BlueprintNotFoundException ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
-            return new ResponseEntity<String>("Error loading blueprints",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Error loading " + author + "'s blueprints.",HttpStatus.NOT_FOUND);
         }        
     }
 
+    /**
+     * Method that allows the user to make a GET request to one blueprint by an author
+     * @param author, the desired author of the bluepint
+     * @param bpname, the blueprint's name to consult
+     * @return the reponse to the GET request in JSON format
+     */
     @RequestMapping(value = "/{author}/{bpname}", method = RequestMethod.GET)
     public ResponseEntity<?> getBlueprint(@PathVariable String author, @PathVariable String bpname){   
         try {
             //obtener datos que se enviarán a través del API
-            return new ResponseEntity<Blueprint>(bps.getBlueprint(author,bpname),HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(bps.getBlueprint(author,bpname),HttpStatus.ACCEPTED);
         } catch (BlueprintNotFoundException ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
-            return new ResponseEntity<String>("Error loading blueprints",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Error loading " + author + "'s " + bpname + " blueprint",HttpStatus.NOT_FOUND);
         }        
     }
 
-    @RequestMapping(value = "/{author}/{bpname}", method = RequestMethod.POST)	
+    /**
+     * Method that allows the user to make a POST request to save one blueprint on persistence
+     * @param bp, the desired blueprint
+     * @return the reponse to the POST
+     */
+    @RequestMapping(method = RequestMethod.POST)	
     public ResponseEntity<?> saveBlueprint(@RequestBody Blueprint bp){
         try {
             System.out.println(bp);
@@ -75,21 +94,28 @@ public class BlueprintAPIController {
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (BlueprintPersistenceException ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
-            return new ResponseEntity<>("Error",HttpStatus.FORBIDDEN);            
+            return new ResponseEntity<>("Error making the POST request to " + bp.getAuthor() + "'s  blueprint by name " + bp.getName(),HttpStatus.FORBIDDEN);            
         }        
     }
 
+    /**
+     * Method that allows the user to make a POST request to save one blueprint on persistence
+     * @param author, the author of the blueprint to modify
+     * @param bprintname, the name of the blueprint to modify
+     * @param bp, the blueprint to modify
+     * @return the reponse to the PUT
+     */
     @RequestMapping(value = "/{author}/{bpname}", method = RequestMethod.PUT)
     public ResponseEntity<?> editBlueprint(@PathVariable String author, @PathVariable String bpname, @RequestBody Blueprint bp){   
         try {
             //obtener datos que se enviarán a través del API
-            bps.editBlueprint(author, bpname, bp);
-            return new ResponseEntity<Blueprint>(HttpStatus.ACCEPTED);
-        } catch (BlueprintNotFoundException ex) {
+            bps.editBlueprint(author,bpname, bp);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (BlueprintNotFoundException | BlueprintPersistenceException ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
-            return new ResponseEntity<String>("Error editing the blueprint",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Error editing " + author + "'s blueprint by name " + bpname ,HttpStatus.NOT_FOUND);
         }        
-    }
+    } 
 }
 
-    
+

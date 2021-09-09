@@ -10,10 +10,15 @@ import edu.eci.arsw.blueprints.model.Point;
 import edu.eci.arsw.blueprints.persistence.BlueprintNotFoundException;
 import edu.eci.arsw.blueprints.persistence.BlueprintPersistenceException;
 import edu.eci.arsw.blueprints.persistence.BlueprintsPersistence;
+
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -27,7 +32,7 @@ import org.springframework.stereotype.Service;
 public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
 
     private final Map<Tuple<String,String>,Blueprint> blueprints=new HashMap<>();
-
+    private static ConcurrentHashMap<Tuple<String,String>, Boolean> inUse = new ConcurrentHashMap<Tuple<String,String>, Boolean>(); 
     public InMemoryBlueprintPersistence() {
         //load stub data
         Point[] pts;
@@ -88,9 +93,22 @@ public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
     }
 
     @Override
-    public void editBlueprint(String author, String bprintname, Blueprint bp) throws BlueprintNotFoundException {
-        Tuple<String, String> key = new Tuple<>(author, bprintname);
-        if (blueprints.containsKey(key)) throw new BlueprintNotFoundException("The given bluprint doesn't exist");
-        blueprints.replace(key, bp);
+    public void editBlueprint(String author, String bpname, Blueprint bp) throws BlueprintNotFoundException {
+        Tuple<String, String> key = new Tuple<>(author, bpname);
+        if (!blueprints.containsKey(key)) throw new BlueprintNotFoundException("The given bluprint doesn't exist");
+
+        synchronized(blueprints.get(key)){
+            try {
+                while (inUse.contains(key) && inUse.get(key)) blueprints.get(key).wait();
+                if(!inUse.contains(key)) inUse.put(key, true);
+                else inUse.replace(key, true);
+                blueprints.replace(key, bp);
+                inUse.replace(key, false);
+                blueprints.get(key).notifyAll();
+            } catch (Exception e) {
+                //TODO: handle exception
+            }           
+        }
+        
     }
 }

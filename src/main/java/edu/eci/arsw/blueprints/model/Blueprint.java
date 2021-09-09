@@ -47,7 +47,7 @@ public class Blueprint {
 
     @Override
     public String toString() {
-        return "Blueprint{" + "author=" + author + ", name=" + name + '}' + "points = " + points;
+        return "Blueprint{" + "author=" + author + ", name=" + name + '}' + ", points = " + points;
     }
 
     @Override

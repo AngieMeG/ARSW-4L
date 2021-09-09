@@ -67,9 +67,10 @@ public class BlueprintAPIController {
         }        
     }
 
-    @RequestMapping(method = RequestMethod.POST)	
+    @RequestMapping(value = "/{author}/{bpname}", method = RequestMethod.POST)	
     public ResponseEntity<?> saveBlueprint(@RequestBody Blueprint bp){
         try {
+            System.out.println(bp);
             bps.saveBlueprint(bp);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (BlueprintPersistenceException ex) {
@@ -82,7 +83,7 @@ public class BlueprintAPIController {
     public ResponseEntity<?> editBlueprint(@PathVariable String author, @PathVariable String bpname, @RequestBody Blueprint bp){   
         try {
             //obtener datos que se enviarán a través del API
-            bps.editBlueprint(author,bpname, bp);
+            bps.editBlueprint(author, bpname, bp);
             return new ResponseEntity<Blueprint>(HttpStatus.ACCEPTED);
         } catch (BlueprintNotFoundException ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);

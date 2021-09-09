@@ -37,7 +37,7 @@ public class BlueprintsServices {
     BlueprintsFilter bpf = null;
     
     /**
-     * 
+     * Add a new blueprint to make persistence
      * @param bp the new blueprint
      * @throws BlueprintPersistenceException if a blueprint with the same name already exists,
      *    or any other low-level persistence error occurs.
@@ -47,15 +47,13 @@ public class BlueprintsServices {
     }
     
     /**
-     * @returns all the blueprints
-     * @return all the blueprints
+     * @returns A set with all the blueprints
      */
     public Set<Blueprint> getAllBlueprints(){
         return bpf.applyFilter(bpp.getAllBlueprints());
     }
     
-    /**
-     * 
+    /**s
      * @param author blueprint's author
      * @param name blueprint's name
      * @return the blueprint of the given name created by the given author
@@ -76,14 +74,22 @@ public class BlueprintsServices {
     }
 
     /**
-     * 
+     * Save a blue print
      * @param bp blueprint to be saved
-     * @throws BlueprintPersistenceException 
+     * @throws BlueprintPersistenceException, if a blueprint with the same name already exists,
+     *    or any other low-level persistence error occurs.
      */
     public void saveBlueprint(Blueprint bp) throws BlueprintPersistenceException{
         bpp.saveBlueprint(bp);
     }
 
+    /**
+     * Modifiy one blueprint in particular
+     * @param author, the author of the blueprint to modify
+     * @param bprintname, the name of the blueprint to modify
+     * @param bp, the blueprint to modify
+     * @throws BlueprintNotFoundException, if the given blueprint doesn't exist
+     */
     public void editBlueprint(String author, String bprintname, Blueprint bp) throws BlueprintNotFoundException{
         bpp.editBlueprint(author, bprintname, bp);
     }

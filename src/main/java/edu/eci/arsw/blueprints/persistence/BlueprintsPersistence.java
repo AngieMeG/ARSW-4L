@@ -20,7 +20,7 @@ import edu.eci.arsw.blueprints.model.Blueprint;
 public interface BlueprintsPersistence {
     
     /**
-     * 
+     * Add a new blueprint to make persistence
      * @param bp the new blueprint
      * @throws BlueprintPersistenceException if a blueprint with the same name already exists,
      *    or any other low-level persistence error occurs.
@@ -43,14 +43,18 @@ public interface BlueprintsPersistence {
 
     /**
      * 
-     * @return All the blueprint by one author
-     * @throws BlueprintNotFoundException
+     * @param author blueprint's author
+     * @return all the blueprints of the given author
+     * @throws BlueprintNotFoundException if the given author doesn't exist
      */
     public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException;
 
     /**
-     * Edit the given blueprint
-     * @throws BlueprintNotFoundException
+     * Edit the given blueprint values
+     * @param author, the author of the blueprint to modify
+     * @param bprintname, the name of the blueprint to modify
+     * @param bp, the blueprint to modify
+     * @throws BlueprintNotFoundException, if the given blueprint doesn't exist
      */
     public void editBlueprint(String author, String bprintname, Blueprint bp) throws BlueprintNotFoundException;
 }

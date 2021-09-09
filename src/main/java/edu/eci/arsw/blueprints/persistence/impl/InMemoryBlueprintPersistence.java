@@ -66,12 +66,7 @@ public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
         return new HashSet<>(blueprints.values());
     }
 
-    /**
-     * 
-     * @param author blueprint's author
-     * @return all the blueprints of the given author
-     * @throws BlueprintNotFoundException if the given author doesn't exist
-     */
+    @Override
     public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException{
         Set<Blueprint> blueprintsByAuthor = new HashSet<>();
         boolean authorExists = false;
@@ -90,7 +85,7 @@ public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
     @Override
     public void editBlueprint(String author, String bprintname, Blueprint bp) throws BlueprintNotFoundException {
         Tuple<String, String> key = new Tuple<>(author, bprintname);
-        if (blueprints.containsKey(key)) throw new BlueprintNotFoundException("The given bluprint doesn't exist");
+        if (!blueprints.containsKey(key)) throw new BlueprintNotFoundException("The given bluprint doesn't exist");
         blueprints.replace(key, bp);
     }
 }

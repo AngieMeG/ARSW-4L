@@ -55,4 +55,10 @@ public class AnotherBlueprintsPersistence implements BlueprintsPersistence{
     public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException{
         return null;
     }
+
+    @Override
+    public void editBlueprint(String author, String bprintname, Blueprint bp) throws BlueprintNotFoundException {
+        // TODO Auto-generated method stub
+        
+    }
 }

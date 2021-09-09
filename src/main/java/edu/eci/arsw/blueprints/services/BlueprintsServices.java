@@ -84,6 +84,10 @@ public class BlueprintsServices {
         bpp.saveBlueprint(bp);
     }
 
+    public void editBlueprint(String author, String bprintname, Blueprint bp) throws BlueprintNotFoundException{
+        bpp.editBlueprint(author, bprintname, bp);
+    }
+
     public static void main(String a[]) {
         ApplicationContext ac = new ClassPathXmlApplicationContext("applicationContext.xml");
         BlueprintsServices bps = ac.getBean(BlueprintsServices.class);

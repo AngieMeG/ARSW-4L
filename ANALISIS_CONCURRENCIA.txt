@@ -1,0 +1,6 @@
+• Qué condiciones de carrera se podrían presentar?
+    ‣ Se podría editar un blueprint que está siendo editado.
+
+• Cuales son las respectivas regiones críticas?
+    ‣ El metodo editBlueprint representa la región crítica más problematica en el codigo.
+
